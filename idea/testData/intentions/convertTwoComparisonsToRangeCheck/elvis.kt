@@ -1,0 +1,1 @@
+fun foo(arg: Int, min: Int? = null, max: Int? = null) = min ?: -10 <= arg && arg <= max ?: 10<caret>

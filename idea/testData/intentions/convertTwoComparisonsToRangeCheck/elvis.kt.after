@@ -1,0 +1,1 @@
+fun foo(arg: Int, min: Int? = null, max: Int? = null) = arg in min ?: -10..max ?: 10
