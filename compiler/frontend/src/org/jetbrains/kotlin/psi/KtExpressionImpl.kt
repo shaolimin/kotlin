@@ -19,6 +19,7 @@ package org.jetbrains.kotlin.psi
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.KtNodeType
+import org.jetbrains.kotlin.psi.psiUtil.replaceExpression
 
 abstract class KtExpressionImpl(node: ASTNode) : KtElementImpl(node), KtExpression {
 
@@ -31,29 +32,5 @@ abstract class KtExpressionImpl(node: ASTNode) : KtElementImpl(node), KtExpressi
 
     override fun replace(newElement: PsiElement): PsiElement {
         return replaceExpression(this, newElement, { super.replace(it) })
-    }
-
-    companion object {
-        fun replaceExpression(expression: KtExpression, newElement: PsiElement, rawReplaceHandler: (PsiElement) -> PsiElement): PsiElement {
-            val parent = expression.parent
-
-            if (newElement is KtExpression) {
-                when (parent) {
-                    is KtExpression, is KtValueArgument -> {
-                        if (KtPsiUtil.areParenthesesNecessary(newElement, expression, parent as KtElement)) {
-                            return rawReplaceHandler(KtPsiFactory(expression).createExpressionByPattern("($0)", newElement))
-                        }
-                    }
-                    is KtSimpleNameStringTemplateEntry -> {
-                        if (newElement !is KtSimpleNameExpression) {
-                            val newEntry = parent.replace(KtPsiFactory(expression).createBlockStringTemplateEntry(newElement)) as KtBlockStringTemplateEntry
-                            return newEntry.expression!!
-                        }
-                    }
-                }
-            }
-
-            return rawReplaceHandler(newElement)
-        }
     }
 }

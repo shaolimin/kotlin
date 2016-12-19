@@ -23,10 +23,7 @@ import com.intellij.psi.SmartPsiElementPointer
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.impl.source.codeStyle.CodeEditUtil
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.psiUtil.PsiChildRange
-import org.jetbrains.kotlin.psi.psiUtil.endOffset
-import org.jetbrains.kotlin.psi.psiUtil.parentsWithSelf
-import org.jetbrains.kotlin.psi.psiUtil.startOffset
+import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.renderer.render
 import java.util.*
 
@@ -55,12 +52,16 @@ private class PsiElementArgumentType<T : PsiElement>(klass: Class<T>) : PsiEleme
         // if argument element has generated flag then it has not been formatted yet and we should do this manually
         // (because we cleared this flag for the whole tree above and PostprocessReformattingAspect won't format anything)
         val reformat = CodeEditUtil.isNodeGenerated(argument.node)
-        var result = placeholder.replace(argument)
+        var result = placeholder.replaceInternal(argument)
         if (reformat) {
             result = CodeStyleManager.getInstance(result.project).reformat(result, true)
         }
         return PsiChildRange.singleElement(result)
     }
+
+    private fun PsiElement.replaceInternal(argument: PsiElement): PsiElement =
+            if (this is KtExpression && argument is KtExpression) replaceExpression(this, argument) { this.replace(it) }
+            else replace(argument)
 }
 
 private object PsiChildRangeArgumentType : PsiElementPlaceholderArgumentType<PsiChildRange, KtElement>(PsiChildRange::class.java, KtElement::class.java) {
