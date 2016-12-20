@@ -27,10 +27,7 @@ import org.jetbrains.kotlin.idea.intentions.branchedTransformations.expressionCo
 import org.jetbrains.kotlin.idea.util.CommentSaver
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.*
-import org.jetbrains.kotlin.psi.psiUtil.PsiChildRange
-import org.jetbrains.kotlin.psi.psiUtil.endOffset
-import org.jetbrains.kotlin.psi.psiUtil.siblings
-import org.jetbrains.kotlin.psi.psiUtil.startOffset
+import org.jetbrains.kotlin.psi.psiUtil.*
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 import org.jetbrains.kotlin.types.typeUtil.isNothing
 import org.jetbrains.kotlin.types.typeUtil.makeNotNullable
@@ -107,21 +104,20 @@ class FoldInitializerAndIfToElvisIntention : SelfTargetingRangeIntention<KtIfExp
         } as? KtNameReferenceExpression ?: return null
 
         if (ifExpression.parent !is KtBlockExpression) return null
-        val prevStatement = ifExpression.siblings(forward = false, withItself = false)
-                                    .firstIsInstanceOrNull<KtExpression>() ?: return null
-        if (prevStatement !is KtVariableDeclaration) return null
+        val prevStatement = (ifExpression.siblings(forward = false, withItself = false)
+                                         .firstIsInstanceOrNull<KtExpression>() ?: return null) as? KtVariableDeclaration
+        prevStatement ?: return null
         if (prevStatement.nameAsName != value.getReferencedNameAsName()) return null
         val initializer = prevStatement.initializer ?: return null
         val then = ifExpression.then ?: return null
         val typeReference = (operationExpression as? KtIsExpression)?.typeReference
 
-        if (then is KtBlockExpression) {
-            val statement = then.statements.singleOrNull() ?: return null
-            return Data(initializer, prevStatement, statement, typeReference)
+        val statement = if (then is KtBlockExpression) then.statements.singleOrNull() else then
+        statement ?: return null
+        if (statement.anyDescendantOfType<KtNameReferenceExpression> { it.getReferencedName() == prevStatement.name }) {
+            return null
         }
-        else {
-            return Data(initializer, prevStatement, then, typeReference)
-        }
+        return Data(initializer, prevStatement, statement, typeReference)
     }
 
     private fun PsiChildRange.withoutLastStatement(): PsiChildRange {
