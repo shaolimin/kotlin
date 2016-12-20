@@ -326,7 +326,7 @@ fun PsiElement.getElementTextWithContext(): String {
 
     return StringBuilder(topLevelElement.text)
             .insert(inFileParentOffset, "<caret>")
-            .insert(0, "File name: ${containingFile.name} Physical: ${containingFile.isPhysical}\n")
+            .insert(0, "File name: ${containingFile.name} Physical: ${containingFile.isPhysical} Valid: $isValid\n")
             .toString()
 }
 
