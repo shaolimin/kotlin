@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor;
 import org.jetbrains.kotlin.descriptors.FunctionDescriptor;
 import org.jetbrains.kotlin.diagnostics.*;
-import org.jetbrains.kotlin.psi.KtClassOrObject;
-import org.jetbrains.kotlin.psi.KtDeclaration;
-import org.jetbrains.kotlin.psi.KtElement;
-import org.jetbrains.kotlin.psi.KtExpression;
+import org.jetbrains.kotlin.psi.*;
 import org.jetbrains.kotlin.types.KotlinType;
 
 import static org.jetbrains.kotlin.diagnostics.PositioningStrategies.*;
@@ -85,6 +82,9 @@ public interface ErrorsJs {
     DiagnosticFactory0<KtExpression> WRONG_BODY_OF_EXTERNAL_DECLARATION = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtElement> EXTERNAL_DELEGATED_CONSTRUCTOR_CALL = DiagnosticFactory0.create(ERROR);
     DiagnosticFactory0<KtElement> EXTERNAL_DELEGATION = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<KtAnonymousInitializer> EXTERNAL_ANONYMOUS_INITIALIZER = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<KtClassBody> EXTERNAL_ENUM_ENTRY_WITH_BODY = DiagnosticFactory0.create(ERROR);
+    DiagnosticFactory0<KtParameter> EXTERNAL_CLASS_CONSTRUCTOR_PROPERTY_PARAMETER = DiagnosticFactory0.create(ERROR);
 
     @SuppressWarnings("UnusedDeclaration")
     Object _initializer = new Object() {

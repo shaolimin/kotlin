@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015 JetBrains s.r.o.
+ * Copyright 2010-2016 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,8 +77,11 @@ private val DIAGNOSTIC_FACTORY_TO_RENDERER by lazy {
             "Only nullable properties of external interfaces are allowed to be non-abstract")
 
         put(ErrorsJs.WRONG_BODY_OF_EXTERNAL_DECLARATION, "Wrong body of external declaration. Must be either ' = noImpl' or { noImpl }")
-        put(ErrorsJs.EXTERNAL_DELEGATED_CONSTRUCTOR_CALL, "Delegated constructor call in external class")
-        put(ErrorsJs.EXTERNAL_DELEGATION, "Using delegate on external declaration")
+        put(ErrorsJs.EXTERNAL_DELEGATED_CONSTRUCTOR_CALL, "Delegated constructor call in external class is not allowed")
+        put(ErrorsJs.EXTERNAL_DELEGATION, "Can't use delegate on external declaration")
+        put(ErrorsJs.EXTERNAL_ANONYMOUS_INITIALIZER, "Anonymous initializer is not allowed in external classes")
+        put(ErrorsJs.EXTERNAL_ENUM_ENTRY_WITH_BODY, "Entry of external enum class can't have body")
+        put(ErrorsJs.EXTERNAL_CLASS_CONSTRUCTOR_PROPERTY_PARAMETER, "External class constructor cannot have a property parameter")
 
         this
     }
