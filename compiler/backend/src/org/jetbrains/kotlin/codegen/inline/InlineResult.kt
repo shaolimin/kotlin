@@ -21,25 +21,36 @@ import java.util.HashSet
 
 class InlineResult private constructor() {
 
+    private val notChangedTypes = hashSetOf<String>()
     private val classesToRemove = HashSet<String>()
     private val changedTypes = HashMap<String, String>()
     val reifiedTypeParametersUsages = ReifiedTypeParametersUsages()
 
-    fun addAllClassesToRemove(child: InlineResult): InlineResult {
-        classesToRemove.addAll(child.classesToRemove)
+    fun merge(child: InlineResult): InlineResult {
+        classesToRemove.addAll(child.getClassesToRemove())
         return this
+    }
+
+    fun mergeWithNotChangeInfo(child: InlineResult): InlineResult {
+        notChangedTypes.addAll(child.notChangedTypes)
+        return merge(child)
     }
 
     fun addClassToRemove(classInternalName: String) {
         classesToRemove.add(classInternalName)
     }
 
+    fun addNotChangedClass(classInternalName: String) {
+        notChangedTypes.add(classInternalName)
+    }
+
     fun addChangedType(oldClassInternalName: String, newClassInternalName: String) {
         changedTypes.put(oldClassInternalName, newClassInternalName)
     }
 
+
     fun getClassesToRemove(): Set<String> {
-        return classesToRemove
+        return classesToRemove - notChangedTypes
     }
 
     fun getChangedTypes(): Map<String, String> {
