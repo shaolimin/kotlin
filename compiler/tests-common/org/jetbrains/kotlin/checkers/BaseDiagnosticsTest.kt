@@ -200,7 +200,7 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
             }
 
             val jvmSignatureDiagnostics = if (skipJvmSignatureDiagnostics)
-                emptySet<Diagnostic>()
+                emptySet<CheckerTestUtil.ActualDiagnostic>()
             else
                 computeJvmSignatureDiagnostics(bindingContext)
 
@@ -209,7 +209,7 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
                     CheckerTestUtil.getDiagnosticsIncludingSyntaxErrors(
                             bindingContext, ktFile, markDynamicCalls, dynamicCallDescriptors
                     ) + jvmSignatureDiagnostics,
-                    whatDiagnosticsToConsider
+                    { whatDiagnosticsToConsider.value(it.diagnostic) }
             )
 
             val diagnosticToExpectedDiagnostic = CheckerTestUtil.diagnosticsDiff(diagnosedRanges, diagnostics, object : CheckerTestUtil.DiagnosticDiffCallbacks {
@@ -248,13 +248,13 @@ abstract class BaseDiagnosticsTest : KotlinMultiFileTestWithJava<TestModule, Tes
             return ok[0]
         }
 
-        private fun computeJvmSignatureDiagnostics(bindingContext: BindingContext): Set<Diagnostic> {
-            val jvmSignatureDiagnostics = HashSet<Diagnostic>()
+        private fun computeJvmSignatureDiagnostics(bindingContext: BindingContext): Set<CheckerTestUtil.ActualDiagnostic> {
+            val jvmSignatureDiagnostics = HashSet<CheckerTestUtil.ActualDiagnostic>()
             val declarations = PsiTreeUtil.findChildrenOfType(ktFile, KtDeclaration::class.java)
             for (declaration in declarations) {
                 val diagnostics = getJvmSignatureDiagnostics(declaration, bindingContext.diagnostics,
                                                              GlobalSearchScope.allScope(project)) ?: continue
-                jvmSignatureDiagnostics.addAll(diagnostics.forElement(declaration))
+                jvmSignatureDiagnostics.addAll(diagnostics.forElement(declaration).map { CheckerTestUtil.ActualDiagnostic(it) })
             }
             return jvmSignatureDiagnostics
         }
