@@ -96,7 +96,9 @@ class ReferenceVariantsHelper(
 
     fun filterOutJavaGettersAndSetters(variants: Collection<DeclarationDescriptor>): Collection<DeclarationDescriptor> {
         val accessorMethodsToRemove = HashSet<FunctionDescriptor>()
-        for (variant in variants) {
+        val _variants = variants.filter { it !is SyntheticJavaPropertyDescriptor || !it.suppressedByNotPropertyList() }
+
+        for (variant in _variants) {
             if (variant is SyntheticJavaPropertyDescriptor) {
                 accessorMethodsToRemove.add(variant.getMethod.original)
 
@@ -107,7 +109,7 @@ class ReferenceVariantsHelper(
             }
         }
 
-        return variants.filter { it !is FunctionDescriptor || it.original !in accessorMethodsToRemove }
+        return _variants.filter { it !is FunctionDescriptor || it.original !in accessorMethodsToRemove }
     }
 
     // filters out variable inside its initializer

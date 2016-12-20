@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.idea.inspections.IntentionBasedInspection
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.idea.resolve.frontendService
 import org.jetbrains.kotlin.idea.util.getResolutionScope
+import org.jetbrains.kotlin.idea.util.shouldNotConvertToProperty
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getQualifiedExpressionForSelector
@@ -87,6 +88,8 @@ class UsePropertyAccessSyntaxIntention : SelfTargetingOffsetIndependentIntention
         if (!resolvedCall.isReallySuccess()) return null
 
         val function = resolvedCall.resultingDescriptor as? FunctionDescriptor ?: return null
+        if (function.shouldNotConvertToProperty()) return null
+
         val resolutionScope = callExpression.getResolutionScope(bindingContext, resolutionFacade)
         val property = findSyntheticProperty(function, resolutionFacade.getFrontendService(SyntheticScopes::class.java)) ?: return null
 
